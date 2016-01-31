@@ -66,7 +66,7 @@ public abstract class FirebaseListAdapter<T> extends BaseAdapter {
     private final Class<T> mModelClass;
     protected int mLayout;
     protected Activity mActivity;
-    FirebaseArray mSnapshots;
+    MultiFirebaseArray mSnapshots;
 
 
     /**
@@ -95,10 +95,43 @@ public abstract class FirebaseListAdapter<T> extends BaseAdapter {
      * @param modelLayout This is the layout used to represent a single list item. You will be responsible for populating an
      *                    instance of the corresponding view with the data from an instance of modelClass.
      * @param ref         The Firebase location to watch for data changes. Can also be a slice of a location, using some
-     *                    combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>,
+     *                    combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>
      */
     public FirebaseListAdapter(Activity activity, Class<T> modelClass, int modelLayout, Firebase ref) {
         this(activity, modelClass, modelLayout, (Query) ref);
+    }
+
+    /**
+     * @param activity    The activity containing the ListView
+     * @param modelClass  Firebase will marshall the data at a location into an instance of a class that you provide
+     * @param modelLayout This is the layout used to represent a single list item. You will be responsible for populating an
+     *                    instance of the corresponding view with the data from an instance of modelClass.
+     * @param refArray    An array of Firebase locations to watch for data changes. Locations can also be a slice of a location, using some
+     *                    combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>
+     */
+    public FirebaseListAdapter(Activity activity, Class<T> modelClass, int modelLayout, Firebase[] refArray) {
+        this(activity, modelClass, modelLayout, (Query[]) refArray);
+    }
+
+    /**
+     * @param activity    The activity containing the ListView
+     * @param modelClass  Firebase will marshall the data at a location into an instance of a class that you provide
+     * @param modelLayout This is the layout used to represent a single list item. You will be responsible for populating an
+     *                    instance of the corresponding view with the data from an instance of modelClass.
+     * @param refArray    An array of Firebase locations to watch for data changes. Locations can also be a slice of a location, using some
+     *                    combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>
+     */
+    public FirebaseListAdapter(Activity activity, Class<T> modelClass, int modelLayout, Query[] refArray) {
+        mModelClass = modelClass;
+        mLayout = modelLayout;
+        mActivity = activity;
+        mSnapshots = new MultiFirebaseArray(refArray);
+        mSnapshots.setOnChangedListener(new MultiFirebaseArray.OnChangedListener() {
+            @Override
+            public void onChanged(EventType type, int index, int oldIndex) {
+                notifyDataSetChanged();
+            }
+        });
     }
 
     public void cleanup() {
