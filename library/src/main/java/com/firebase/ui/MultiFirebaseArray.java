@@ -7,6 +7,9 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class implements an array-like collection on top of multiple Firebase locations.
@@ -20,29 +23,29 @@ public class MultiFirebaseArray implements ChildEventListener{
         void onChanged(EventType type, int index, int oldIndex);
     }
 
-    protected Query[] mQueryArray;
-    protected OnChangedListener[] mListenerArray;
+    protected List<Query> mQueryList;
+    protected OnChangedListener mListener;
     protected ArrayList<DataSnapshot> mSnapshots;
 
     //TODO How can I not duplicate code between the constructors?
     protected MultiFirebaseArray (Query ref){
-        Query[] refArray = {ref};
-        mQueryArray = refArray;
+        mQueryList = new ArrayList<>(1);
+        mQueryList.add(ref);
         mSnapshots = new ArrayList<DataSnapshot>();
-        for(int i = 0; i < mQueryArray.length; i++)
-            mQueryArray[i].addChildEventListener(this);
+        for(int i = 0; i < mQueryList.size(); i++)
+            mQueryList.get(i).addChildEventListener(this);
     }
 
-    public MultiFirebaseArray(Query[] refArray) {
-        mQueryArray = refArray;
+    public MultiFirebaseArray(List<Query> refList) {
+        mQueryList = refList;
         mSnapshots = new ArrayList<DataSnapshot>();
-        for(int i = 0; i < mQueryArray.length; i++)
-            mQueryArray[i].addChildEventListener(this);
+        for(int i = 0; i < mQueryList.size(); i++)
+            mQueryList.get(i).addChildEventListener(this);
     }
 
     public void cleanup() {
-        for(int i = 0; i < mListenerArray.length; i++) {
-            mQueryArray[i].removeEventListener(this);
+        for(int i = 0; i < mSnapshots.size(); i++) {
+            mQueryList.get(i).removeEventListener(this);
         }
     }
 
@@ -102,18 +105,13 @@ public class MultiFirebaseArray implements ChildEventListener{
     // End of ChildEventListener methods
 
     public void setOnChangedListener(OnChangedListener listener) {
-        for(int i = 0; i < mQueryArray.length; i++) {
-            mListenerArray[i] = listener;
-        }
+        mListener = listener;
     }
     protected void notifyChangedListeners(OnChangedListener.EventType type, int index) {
         notifyChangedListeners(type, index, -1);
     }
     protected void notifyChangedListeners(OnChangedListener.EventType type, int index, int oldIndex) {
-       for(int i = 0; i < mListenerArray.length; i++) {
-           if (mListenerArray[i] != null) {
-               mListenerArray[i].onChanged(type, index, oldIndex);
-           }
-       }
+        if(mListener != null)
+            mListener.onChanged(type, index, oldIndex);
     }
 }
