@@ -39,6 +39,7 @@ import com.firebase.client.Query;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * This class is a generic way of backing an RecyclerView with a Firebase location.
@@ -157,21 +158,21 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
      * @param refArray    An array of Firebase locations to watch for data changes. Locations can also be a slice of a location, using some
      *                    combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>
      */
-    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, Query[] refArray) {
+    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, List<Query> refArray) {
         this(modelClass, modelLayout, viewHolderClass, new MultiFirebaseArray(refArray));
     }
 
-    /**
+    /*
      * @param modelClass Firebase will marshall the data at a location into an instance of a class that you provide
      * @param modelLayout This is the layout used to represent a single item in the list. You will be responsible for populating an
      *                    instance of the corresponding view with the data from an instance of modelClass.
      * @param viewHolderClass The class that hold references to all sub-views in an instance modelLayout.
      * @param refArray    An array of Firebase locations to watch for data changes. Locations can also be a slice of a location, using some
      *                    combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>
-     */
-    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, Firebase[] refArray) {
-        this(modelClass, modelLayout, viewHolderClass, (Query[]) refArray);
-    }
+     TODO Be able to cast to a Query list for correct mirroring
+    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, List<Firebase> refArray) {
+            this(modelClass, modelLayout, viewHolderClass, (Query[]) refArray);
+    }*/
 
 
     public void cleanup() {
